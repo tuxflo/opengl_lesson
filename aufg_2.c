@@ -5,6 +5,7 @@
 
 void paintLine(float radius);
 void paintCircle(float radius);
+void drawWheel();
 /* display function - code from:
      http://fly.cc.fer.hr/~unreal/theredbook/chapter01.html
 This is the actual usage of the OpenGL library. 
@@ -17,25 +18,32 @@ void renderFunction()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1.0, 1.0, 1.0);
 	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+	//drawWheel();
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(-1,0);
+	glVertex2f(1,0);
+	glEnd();
+	glFlush();
+	
+}
 
-	GLuint index = glGenLists(1);
-	glNewList(index, GL_COMPILE);
+void drawWheel()
+{
+	glNewList(1, GL_COMPILE);
 		paintCircle(0.8);
 		glPushMatrix();
-		for(int i=0; i<30; i++)
+		for(int i=0; i<10; i++)
 		{
-			glRotatef(12,0,0,1);
+			glRotatef(36,0,0,1);
 			paintLine(0.8);
-
 		}
 		glPopMatrix();
 	glEndList();
-	glCallList(index);
+//	glCallList(1);
+	glEnd();
 	glFlush();
-	//paintCircle(0.8);
-//	paintLine(0.8);
+	
 }
-
 void paintCircle(float radius)
 {
 	float pi = 3.14159;
@@ -63,16 +71,23 @@ void paintLine(float radius)
 void keyboard(unsigned char key, int x, int y)
 { switch (key) {
 	case 'w':
-	glRotatef(30,0,0,1);
-	paintLine(0.8);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glTranslatef(0.01,0,0);
+	glCallList(1);
+	glFlush();
 	break;
 	case 'a':
-	glRotatef(50,0,1,0);
-	paintLine(0.8);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glRotatef(1,0,0,1);
+	//drawWheel();
+	glCallList(1);
+	glFlush();
 	break;
 	case 's':
-	glRotatef(50,1,0,0);
-	paintLine(0.8);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glRotatef(-1,0,0,1);
+	glCallList(1);
+	glFlush();
 	break;
 	default:
 	       	printf("Taste %c gedrückt\n", key);
@@ -90,7 +105,6 @@ int main(int argc, char** argv)
     glutInitWindowPosition(100,100);
     glutCreateWindow("OpenGL - First window demo");
     glutKeyboardFunc(keyboard);
-
     glutDisplayFunc(renderFunction);
     glutMainLoop();    
     return 0;
