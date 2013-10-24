@@ -2,6 +2,6 @@ CC=g++
 CFLAGS=-Wall
 LDFLAGS=-lGLU -lglut -lGL
 
-all: 
-	$(CC) $(CFLAGS) aufg_2.c -o aufg $(LDFLAGS) 
+aufg_2.c: 
+	$(CC) $(CFLAGS) $@ -o out $(LDFLAGS) 
 

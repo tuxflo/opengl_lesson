@@ -6,6 +6,7 @@
 void paintLine(float radius);
 void paintCircle(float radius);
 void drawWheel();
+int rot=0;
 /* display function - code from:
      http://fly.cc.fer.hr/~unreal/theredbook/chapter01.html
 This is the actual usage of the OpenGL library. 
@@ -18,11 +19,8 @@ void renderFunction()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1.0, 1.0, 1.0);
 	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
-	//drawWheel();
-	glBegin(GL_LINE_STRIP);
-	glVertex2f(-1,0);
-	glVertex2f(1,0);
-	glEnd();
+//	drawWheel();
+	glCallList(1);
 	glFlush();
 	
 }
@@ -39,7 +37,7 @@ void drawWheel()
 		}
 		glPopMatrix();
 	glEndList();
-//	glCallList(1);
+	glCallList(1);
 	glEnd();
 	glFlush();
 	
@@ -68,13 +66,25 @@ void paintLine(float radius)
 	glEnd();
 	glFlush();
 }
-void keyboard(unsigned char key, int x, int y)
-{ switch (key) {
-	case 'w':
+
+void timer(int value)
+{
+	if(value==360)
+		value=0;
 	glClear(GL_COLOR_BUFFER_BIT);
-	glTranslatef(0.01,0,0);
-	glCallList(1);
-	glFlush();
+	glPushMatrix();
+	glRotatef(value, 0, 0, 1);
+	glPopMatrix();
+	glutPostRedisplay();
+	glutTimerFunc(20, timer, ++value);
+
+}
+void keyboard(unsigned char key, int x, int y)
+{
+ rot++;
+switch (key) {
+	case 'w':
+	glRotatef(2,1,0,0);
 	break;
 	case 'a':
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -105,6 +115,8 @@ int main(int argc, char** argv)
     glutInitWindowPosition(100,100);
     glutCreateWindow("OpenGL - First window demo");
     glutKeyboardFunc(keyboard);
+    drawWheel();
+    glutTimerFunc(1,timer,0);
     glutDisplayFunc(renderFunction);
     glutMainLoop();    
     return 0;
