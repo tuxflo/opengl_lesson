@@ -10,11 +10,12 @@
 #include <GL/freeglut.h>
 #include <math.h>
 
-int _x=0;
+float _x=5;
 
-int _y=0;
-int x_old=0;
-int y_old=0;
+float _y=5;
+float x_new=0;
+float y_new=0;
+bool finished_move=true;
 void draw_circle(float radius)
 {
 
@@ -27,28 +28,38 @@ void draw_circle(float radius)
 
 void timer(int value)
 {
-	printf("value: %d\n", value);
-	if(value < 50)
+	//printf("value: %d\n", value);
+	if(_x < 10 && _x > 0 && _y < 10 && _y > 0)
 	{
-		_x = x_old*0.1;
-		_y= y_old*0.1;
+		_x +=  0.01 * (x_new);
+		_y +=  0.01 * (y_new);
+		printf("x: %f y: %f \n", _x, _y);
 		glutPostRedisplay();
-		glutTimerFunc(200, timer, ++value);
-
+		glutTimerFunc(20, timer, ++value);
 	}
+	else
+	{
+		printf("x: %f y: %f \n", _x, _y);
+		finished_move = true;
+	}
+
 }
 void mouse(int button, int state, int x, int y)
 {
 	switch(button)
 	{
 		case(GLUT_LEFT_BUTTON):
-		if(state == GLUT_DOWN)
+		if(state == GLUT_DOWN && finished_move)
 		{
+			finished_move = false;
 			printf("left button: x= %d, y= %d\n", x, y);
-			x_old = _x;
-			y_old = _y;
-			_x = x;
-			_y = 500 - y;
+			x_new = x - _x;
+			y_new = 500 - y - _y;
+			glPointSize(10);
+			glBegin(GL_POINTS);
+			glVertex2f(x, y);
+			glEnd();
+			glFlush();
 			timer(0);
 			//glutPostRedisplay();
 		}
@@ -62,12 +73,12 @@ static void myinit(void)
 	printf( "OpenGL driver version:            |%s|\n", (char*)glGetString( GL_VERSION));	
 
 	float pi = 3.14159;
-	int radius = 10;
+	int radius = 1;
     /* Initializations */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glClearColor (1.0, 1.0, 1, 1.0); //Hintergrundfarbe
-    glOrtho(0.0, 500.0, 0.0, 500.0, 0.0, 1.0);
+    glOrtho(0.0, 10, 0.0, 10, 0.0, 1.0);
     glNewList(1, GL_COMPILE);
 	glBegin(GL_LINE_LOOP);
 	for(int i=0; i< 360; i++)
@@ -87,6 +98,40 @@ static void RenderScene(void)
     //glColor3f(0.0,0.9,0.9);		  /* White Rahmenfarbe*/
     draw_circle(50);  
     glFlush ();		  /* Flushes OpenGL command queues and buffers */
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+	switch(key)
+	{
+		case('w'):
+			break;
+		
+		
+	}
+
+
+}
+
+void arrow_keys(int key, int x, int y)
+{
+	switch(key)
+	{
+		case(GLUT_KEY_UP):
+			y_new = 9.9;
+			break;
+		case(GLUT_KEY_DOWN):
+			y_new = 1 - _y;
+			break;
+		case(GLUT_KEY_RIGHT):
+			x_new = 9.9;
+			break;
+		case(GLUT_KEY_LEFT):
+			x_new = 1 - _x;
+			break;	
+	}
+	timer(0);
+
 }
 
 
@@ -116,6 +161,8 @@ int main(int argc, char** argv)
 
     glutReshapeFunc (myReshape); /* Function to call when window changes size */
     glutMouseFunc(mouse);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(arrow_keys);
     glutTimerFunc(0, timer, 0);
     glutDisplayFunc(RenderScene); /* Creating the Szene */
     glutMainLoop();	
